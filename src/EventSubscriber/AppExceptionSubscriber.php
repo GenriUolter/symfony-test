@@ -87,7 +87,7 @@ readonly class AppExceptionSubscriber implements EventSubscriberInterface
 
         return match ($exception::class) {
             AppException::class => $exception->getCode(),
-            default             => Response::HTTP_BAD_REQUEST
+            default             => Response::HTTP_INTERNAL_SERVER_ERROR
         };
     }
 
