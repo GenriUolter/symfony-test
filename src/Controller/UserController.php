@@ -87,7 +87,7 @@ final class UserController extends AbstractController
      * @throws AppException
      */
     #[Route('/{id}', name: 'app_user_update', methods: ['PUT'])]
-    #[IsGranted('update')]
+    #[IsGranted('update', 'user')]
     public function update(
         User                  $user,
         Request               $request,

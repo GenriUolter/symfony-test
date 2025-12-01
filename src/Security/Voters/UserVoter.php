@@ -61,7 +61,7 @@ class UserVoter extends Voter
         }
 
         return match ($attribute) {
-            self::VIEW, self::UPDATE => $user->getId() === $subject->getId(),
+            self::VIEW, self::UPDATE => $user->getId() === $subject?->getId(),
             default                  => false
         };
     }

@@ -92,6 +92,12 @@ readonly class UserService
             $user->setLogin($updateData->login);
             $user->setPhone($updateData->phone);
             $user->setRole($updateData->role);
+            $user->setPassword(
+                $this->passwordHasher->hashPassword(
+                    $user,
+                    $updateData->password
+                )
+            );
 
             $this->entityManager->flush();
 
