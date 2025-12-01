@@ -1,0 +1,522 @@
+openapi: 3.0.3
+
+info:
+    title: Symfony API
+    version: 1.0.0
+
+servers:
+    -   url: /
+        description: Localhost
+
+tags:
+    -   name: Auth
+        description: Auth methods
+    -   name: Users
+        description: Users methods
+
+components:
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            description: Authorization token
+    responses:
+        200:
+            description: Success
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseSuccess'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+        400:
+            description: Bad request
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseError'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                            -   type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Wrong credentials"
+        401:
+            description: Unauthorized
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseError'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                            -   type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Unauthorized"
+        403:
+            description: Forbidden
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseError'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                            -   type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "You don't have permission to do that"
+        404:
+            description: Not found
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseError'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                            -   type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "User not found"
+        405:
+            description: Method Not Allowed
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseError'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                            -   type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "The method is not supported for this route."
+        409:
+            description: Conflict
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseError'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                            -   type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "This item category belongs to the user's inaccessible departments."
+        422:
+            description: Validation error
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseError'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                            -   type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "The email field is required. (and 1 more error)"
+                                    payload:
+                                        type: object
+                                        properties:
+                                            content:
+                                                type: object
+                                                properties:
+                                                    "email":
+                                                        type: string
+                                                        example: "The email field is required."
+                                                    "password":
+                                                        type: string
+                                                        example: "The password field is required."
+        429:
+            description: Too Many Requests
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseError'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                            -   type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Too Many Attempts"
+        500:
+            description: Internal Server Error
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseError'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                            -   type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Something went wrong"
+        503:
+            description: Service are not configured
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            -   $ref: '#/components/schemas/ApiResponseError'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                            -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                            -   type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Service are not configured"
+    parameters:
+        ModelIdInt:
+            name: id
+            required: true
+            description: Model id
+            in: path
+            schema:
+                type: integer
+    schemas:
+        # Default schemas
+        ApiResponseSuccess:
+            type: object
+            properties:
+                status:
+                    type: string
+                    example: "success"
+                message:
+                    type: string
+                    nullable: true
+                    example: null
+                payload:
+                    type: object
+                    properties:
+                        content:
+                            type: object
+                        pagination:
+                            type: object
+                            properties:
+                                elements:
+                                    type: integer
+                                    example: 1
+                                first:
+                                    type: boolean
+                                    example: true
+                                last:
+                                    type: boolean
+                                    example: false
+                                page:
+                                    type: integer
+                                    example: 1
+                                size:
+                                    type: integer
+                                    example: 15
+                                total_elements:
+                                    type: integer
+                                    example: 1
+                                total_pages:
+                                    type: integer
+                                    example: 1
+                service:
+                    type: object
+        ApiResponseError:
+            allOf:
+                -   $ref: '#/components/schemas/ApiResponseSuccess'
+                -   type: object
+                    properties:
+                        status:
+                            type: string
+                            example: "error"
+        ApiResponseModifierWithoutContent:
+            type: object
+            properties:
+                payload:
+                    type: object
+                    properties:
+                        content:
+                            type: object
+                            example: null
+        ApiResponseModifierWithoutPagination:
+            type: object
+            properties:
+                payload:
+                    type: object
+                    properties:
+                        pagination:
+                            type: object
+                            example: null
+        # Request schemas
+        AuthRequest:
+            type: object
+            properties:
+                login:
+                    type: string
+                    example: ""
+                password:
+                    type: string
+                    example: ""
+        UserCreateRequest:
+            type: object
+            required:
+                - login
+                - password
+                - phone
+                - role
+            properties:
+                login:
+                    type: string
+                    example: "test"
+                role:
+                    type: string
+                    description: "root or user"
+                    example: "user"
+                password:
+                    type: string
+                    example: "test"
+                phone:
+                    type: string
+                    example: "123123"
+        UserUpdateRequest:
+            type: object
+            required:
+                - login
+                - password
+                - phone
+                - role
+            properties:
+                login:
+                    type: string
+                    example: "test"
+                role:
+                    type: string
+                    description: "root or user"
+                    example: "user"
+                password:
+                    type: string
+                    example: "test"
+                phone:
+                    type: string
+                    example: "123123"
+
+        # Response schemas
+        UserProfileResource:
+            allOf:
+                -   type: object
+                    properties:
+                        token:
+                            type: string
+                        expires_at:
+                            type: integer
+                        user:
+                            type: object
+                            properties:
+                                id:
+                                    type: integer
+                                role:
+                                    type: string
+
+        UserResource:
+            allOf:
+                -   type: object
+                    properties:
+                        id:
+                            type: integer
+                            example: 1
+                        login:
+                            type: string
+                            example: "test"
+                        phone:
+                            type: string
+                            example: "123123"
+                        role:
+                            type: string
+                            example: "user"
+paths:
+
+    # Dashboard methods
+    /api/auth/login:
+        post:
+            tags:
+                - Auth
+            summary: Authenticate user
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AuthRequest'
+            responses:
+                200:
+                    description: Success response
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/ApiResponseSuccess'
+                                    -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                                    -   type: object
+                                        properties:
+                                            payload:
+                                                type: object
+                                                properties:
+                                                    content:
+                                                        type: object
+                                                        $ref: '#/components/schemas/UserProfileResource'
+                400:
+                    $ref: '#/components/responses/400'
+                401:
+                    $ref: '#/components/responses/401'
+                422:
+                    $ref: '#/components/responses/422'
+                500:
+                    $ref: '#/components/responses/500'
+
+    /api/users:
+        post:
+            tags:
+                - Users
+            summary: Create user
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UserCreateRequest'
+            responses:
+                200:
+                    description: Success response
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/ApiResponseSuccess'
+                                    -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                                    -   type: object
+                                        properties:
+                                            payload:
+                                                type: object
+                                                properties:
+                                                    content:
+                                                        type: object
+                                                        $ref: '#/components/schemas/UserResource'
+                422:
+                    $ref: '#/components/responses/422'
+                500:
+                    $ref: '#/components/responses/500'
+
+    /api/users/{id}:
+        get:
+            tags:
+                - Users
+            summary: User info
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   $ref: '#/components/parameters/ModelIdInt'
+            responses:
+                200:
+                    description: Success response
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/ApiResponseSuccess'
+                                    -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                                    -   type: object
+                                        properties:
+                                            payload:
+                                                type: object
+                                                properties:
+                                                    content:
+                                                        type: object
+                                                        $ref: '#/components/schemas/UserResource'
+                401:
+                    $ref: '#/components/responses/401'
+                403:
+                    $ref: '#/components/responses/403'
+                404:
+                    $ref: '#/components/responses/404'
+                500:
+                    $ref: '#/components/responses/500'
+        put:
+            tags:
+                - Users
+            summary: Update user
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   $ref: '#/components/parameters/ModelIdInt'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UserUpdateRequest'
+            responses:
+                200:
+                    description: Success response
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/ApiResponseSuccess'
+                                    -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                                    -   type: object
+                                        properties:
+                                            payload:
+                                                type: object
+                                                properties:
+                                                    content:
+                                                        type: object
+                                                        $ref: '#/components/schemas/UserResource'
+                401:
+                    $ref: '#/components/responses/401'
+                403:
+                    $ref: '#/components/responses/403'
+                404:
+                    $ref: '#/components/responses/404'
+                422:
+                    $ref: '#/components/responses/422'
+                500:
+                    $ref: '#/components/responses/500'
+        delete:
+            tags:
+                - Users
+            summary: Delete user
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   $ref: '#/components/parameters/ModelIdInt'
+            responses:
+                200:
+                    description: Success response
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/ApiResponseSuccess'
+                                    -   $ref: '#/components/schemas/ApiResponseModifierWithoutContent'
+                                    -   $ref: '#/components/schemas/ApiResponseModifierWithoutPagination'
+                401:
+                    $ref: '#/components/responses/401'
+                403:
+                    $ref: '#/components/responses/403'
+                404:
+                    $ref: '#/components/responses/404'
+                500:
+                    $ref: '#/components/responses/500'
